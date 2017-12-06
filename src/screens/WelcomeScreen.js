@@ -48,7 +48,7 @@ class WelcomeScreen extends Component {
     });
   }
 
-  onPressSave = () => {
+  onPressExport = () => {
     Alert.alert('hello');
   }
 
@@ -59,39 +59,23 @@ class WelcomeScreen extends Component {
       backButtonHidden: true,
       navigatorButtons: {
         rightButtons: [
-          // {
-          //   id: 'button1',
-          //   title: 'jpg'
-          // },
-          // {
-          //   id: 'button2',
-          //   title: 'timilai k vanu'
-          // },
           {
             id: 'browse-button',
             component: 'NavButton', // This line loads our component as a nav bar button item
             title: 'hello',
             passProps: {
-              iconName: 'file-text',
+              iconName: 'folder-open',
               onPress: this.onPressBrowse
             },
           },
           {
-            id: 'save-button',
+            id: 'export-button',
             component: 'NavButton', // This line loads our component as a nav bar button item
             passProps: {
-              iconName: 'save',
-              onPress: this.onPressSave
+              iconName: 'file-export',
+              onPress: this.onPressExport
             },
           },
-          // {
-          //   id: 'button3',
-          //   component: 'NavButton', // This line loads our component as a nav bar button item
-          //   passProps: {
-          //     iconName: 'rocket',
-          //     onPress: this.onPressSave
-          //   },
-          // },
         ],
       },
     });

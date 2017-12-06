@@ -5,20 +5,20 @@ import {
   Text
 } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const styles = ScaledSheet.create({
   button: {
     overflow: 'hidden',
-    width: '40@s',
-    height: '34@s',
+    width: 40,
+    height: 34,
     justifyContent: 'center',
     alignItems: 'center',
   },
   touchable: {
-    top: '6@s',
+    top: 6,
     backgroundColor: 'rgba(0, 0, 0, 0)',
-    right: '5@s'
+    right: 5
   }
 });
 
