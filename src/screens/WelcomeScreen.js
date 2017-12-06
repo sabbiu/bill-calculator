@@ -36,7 +36,7 @@ class WelcomeScreen extends Component {
   }
 
   navigateToMainScreen = () => {
-    this.props.navigator.push({
+    this.props.navigator.resetTo({
       screen: 'main',
       title: 'New Bill',
       backButtonHidden: true
