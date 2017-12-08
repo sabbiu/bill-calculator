@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 
-import billReducers from './billReducers';
+import bill from './billReducers';
+import savedBills from './saveReducers';
 
 export default combineReducers({
-  bill: billReducers
+  bill, savedBills
 })

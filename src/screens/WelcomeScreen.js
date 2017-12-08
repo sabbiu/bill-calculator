@@ -46,6 +46,7 @@ class WelcomeScreen extends Component {
       screen: 'browse',
       title: 'Browse Bills'
     });
+    console.log(this.props)
   }
 
   onPressExport = () => {

@@ -1,12 +1,31 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Text, View } from 'react-native';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-const Screen1 = () => {
-  return (
-    <View>
-      <Text>Screen2</Text>
-    </View>
-  );
+
+class BrowseScreen extends Component {
+
+  render() {
+    return (
+      <View style={{flex:1, backgroundColor: 'white'}}>
+        <Text>Hello</Text>
+        {this.props.savedBills.map((item, i) => {
+          return (
+            <Text key={i}>{item}</Text>
+          )
+        })}
+      </View>
+    );
+  }
 }
 
-export default Screen1;
+function mapStateToProps({ savedBills }) {
+  return { savedBills };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({  }, dispatch);
+}
+
+export default connect(mapStateToProps)(BrowseScreen);
