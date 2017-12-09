@@ -6,7 +6,9 @@ import {
   ADD_TO_LIST,
   LOAD_SAVED_ITEMS,
   SAVE_BILL,
-  CLEAR_BILL
+  CLEAR_BILL,
+  TOP_UPDATES,
+  SAVE_OTHERS
 
 } from './types';
 
@@ -29,7 +31,8 @@ export const addToList = (props) => {
   const items = [ ...props.items, { ...props.currentItem, quantity: props.currentItem.quantity==='' ? 1: props.currentItem.quantity} ];
   const current = {
     items,
-    discount: props.discount
+    discount: props.discount,
+    title: props.title
   }
   // AsyncStorage.setItem('current', JSON.stringify());
   AsyncStorage.setItem('current', JSON.stringify(current));
@@ -39,12 +42,11 @@ export const addToList = (props) => {
 export const loadSaved = () => {
   return(dispatch) => {
     try{
-      AsyncStorage.getItem('current').then(items => {
-        console.log('items received', items)
-        if (items) {
+      AsyncStorage.getItem('current').then(current => {
+        if (current) {
           dispatch({
             type: LOAD_SAVED_ITEMS,
-            payload: JSON.parse(items)
+            payload: JSON.parse(current)
           });
         } else {
           dispatch({
@@ -66,3 +68,25 @@ export const clearBill = () => {
   }
 };
 
+export const topUpdates = ({prop, value}) => {
+  return {
+    type: TOP_UPDATES,
+    payload: {prop, value}
+  };
+};
+
+
+export const saveOthers = ({prop, value}) => (dispatch) => {
+  try{
+    AsyncStorage.getItem('current').then(current => {
+      if (current) {
+        AsyncStorage.setItem('current', JSON.stringify({...JSON.parse(current), [prop]:value}));        
+      } else {
+        AsyncStorage.setItem('current', JSON.stringify({[prop]:value}));        
+      }
+      dispatch({ type: SAVE_OTHERS });
+    })
+  } catch (error) {
+    console.log(error);
+  }
+};

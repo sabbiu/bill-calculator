@@ -3,7 +3,9 @@ import {
   DECIMAL_VALUE_ERROR,
   ADD_TO_LIST,
   LOAD_SAVED_ITEMS,
-  CLEAR_BILL
+  CLEAR_BILL,
+  TOP_UPDATES,
+  SAVE_OTHERS
 
 } from '../actions/types';
 
@@ -69,26 +71,34 @@ export default (state = INITIAL_STATE, action) => {
 
     case LOAD_SAVED_ITEMS:
       if (action.payload) {
-        const currentItem_temp_2 = {
-          ...INITIAL_STATE.currentItem,
-          id: action.payload.items.length+1
+        if (action.payload.items){
+          const currentItem_temp_2 = {
+            ...INITIAL_STATE.currentItem,
+            id: action.payload.items.length+1
+          }
+          const sum_2 = 0;
+          action.payload.items.forEach((item)=> sum_2+=item.total);
+          
+          return { 
+            ...state, 
+            items: action.payload.items, 
+            currentItem: currentItem_temp_2, 
+            total: sum_2,
+            discount: action.payload.discount,
+            title: action.payload.title
+          };
+        } else {
+          return { ...INITIAL_STATE, ...action.payload };
         }
-        const sum_2 = 0;
-        action.payload.items.forEach((item)=> sum_2+=item.total);
-        
-        return { 
-          ...state, 
-          items: action.payload.items, 
-          currentItem: currentItem_temp_2, 
-          total: sum_2,
-          discount: action.payload.discount
-        };
       } else return INITIAL_STATE;
 
     case CLEAR_BILL:
-      console.log(INITIAL_STATE)
       return INITIAL_STATE;
+    
+    case TOP_UPDATES:
+      return { ...state, [action.payload.prop]: action.payload.value };
 
+    case SAVE_OTHERS:
     default:
       return state;
   }

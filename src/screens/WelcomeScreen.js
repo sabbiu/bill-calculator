@@ -60,15 +60,15 @@ class WelcomeScreen extends Component {
       backButtonHidden: true,
       navigatorButtons: {
         rightButtons: [
-          {
-            id: 'browse-button',
-            component: 'NavButton', // This line loads our component as a nav bar button item
-            title: 'hello',
-            passProps: {
-              iconName: 'folder-open',
-              onPress: this.onPressBrowse
-            },
-          },
+          // {
+          //   id: 'browse-button',
+          //   component: 'NavButton', // This line loads our component as a nav bar button item
+          //   title: 'hello',
+          //   passProps: {
+          //     iconName: 'folder-open',
+          //     onPress: this.onPressBrowse
+          //   },
+          // },
           {
             id: 'export-button',
             component: 'NavButton', // This line loads our component as a nav bar button item

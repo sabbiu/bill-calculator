@@ -14,13 +14,16 @@ import { Button } from 'react-native-elements';
 import { Navigation } from 'react-native-navigation';
 import ListItem from '../components/ListItem';
 import List from '../components/List';
+import Modal from '../components/Modal';
 
 import { 
   currentItemUpdate, 
   addToList,
-  saveBill,
+  // saveBill,
   clearBill,
-  loadSaved
+  loadSaved,
+  topUpdates,
+  saveOthers
 } from '../actions';
 import { SCREEN_WIDTH } from '../constants';
 
@@ -33,32 +36,29 @@ class MainScreen extends Component {
       topButtons : [
         { title: 'Edit Title', onPress: this.onEditTitle },
         { title: 'Discount', onPress: this.onDiscount },
-        { title: 'Save Bill', onPress: this.onSaveBill },
+        // { title: 'Save Bill', onPress: this.onSaveBill },
         { title: 'Clear Bill', onPress: this.onClearBill },
-      ]
+      ],
+
+      editTitleVisible: false,
+      clearBillVisible: false
     }
   }
 
-  onEditTitle = () => {}
+  onEditTitle = () => { this.setState({editTitleVisible:true}) }
   onDiscount = () => {}
-  onSaveBill = () => {
-    console.log(this.props.items)
-    this.props.saveBill();
-  }
-  onClearBill = () => {
-    this.props.clearBill();
-  }
+  onSaveBill = () => {}
+  onClearBill = () => { this.setState({clearBillVisible:true}) }
 
   componentWillMount() {
     this.props.loadSaved();
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.title != prevProps.title) {
+    if (prevProps.title != this.props.title)
       this.props.navigator.setTitle({
         title: this.props.title
-      })
-    }
+      });
   }
 
   componentDidMount() {
@@ -73,17 +73,17 @@ class MainScreen extends Component {
 
   render () {
     const { listCol, rightJustified } = styles;
-    const { currentItem, items, discount, total, error, success } = this.props;
+    const { currentItem, items, discount, total, error, success, title } = this.props;
 
     return (
-      <View style={{flex:1, backgroundColor: '#eeeeee'}}>
+      <View style={{flex:1, backgroundColor: '#eee'}}>
         <View style={{height: 50}}>
 
           <View style={{flex:1, flexDirection:'row', marginTop:5}}>
 
             {this.state.topButtons.map((item, i)=> (
               <View key={i} style={{flex:1}}>
-                <Button title={item.title} onPress={item.onPress} backgroundColor="#990000" containerViewStyle={{width: '98%', marginLeft: '1%'}} raised />
+                <Button title={item.title} onPress={item.onPress} backgroundColor="#900" containerViewStyle={{width: '98%', marginLeft: '1%'}} raised />
               </View>
             ))}
             
@@ -129,7 +129,7 @@ class MainScreen extends Component {
           </View>
         </View> 
 
-        {currentItem.rate !== ''
+        {currentItem.rate !== '' /*&& currentItem.name !== ''*/
           ? (<Button onPress={()=>this.props.addToList(this.props)} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
           : null}
 
@@ -193,9 +193,13 @@ class MainScreen extends Component {
           
                 <View style={{flex:1, flexDirection: 'row'}}>
           
-                  <View style={[{backgroundColor: 'white',borderRightWidth:1, borderRightColor: '#ccc', flex:9}, listCol, {paddingRight:22}]}>
+                  <View style={[{backgroundColor: 'white',borderRightWidth:1, borderRightColor: '#ccc', flex:7}, listCol, {paddingRight:14}]}>
                     <Text style={{fontWeight:'bold'}}>Discount</Text>
-                  </View>             
+                  </View> 
+
+                  <View style={[{backgroundColor: '#fff',borderRightWidth:1, borderRightColor: '#ccc', flex:2,}, listCol, rightJustified]}>
+                    <Text>{`${discount} %`}</Text>
+                  </View>            
           
                   <View style={[{backgroundColor: '#fff', flex:3}, listCol, rightJustified]}>
                     <Text style={{fontWeight:'bold'}}>{discount.toFixed(2)}</Text>
@@ -234,6 +238,45 @@ class MainScreen extends Component {
 
 
         </ScrollView>
+
+        <Modal
+          visible={this.state.editTitleVisible}
+          title="Set title for your bill"
+          content={
+            <View style={{flex:1, flexDirection:'column', alignItems:'center'}}>
+              <TextInput 
+                placeholder="Edit the title"
+                style={{width:"80%"}}
+                value={title}
+                onChangeText={value => this.props.topUpdates({prop:'title', value})}
+              />
+            </View>
+          }
+          onAccept={()=>{
+            this.props.navigator.setTitle({ title });
+            this.props.saveOthers({prop:'title', value:title});
+            this.setState({editTitleVisible: false});
+          }}
+          onDecline={null}
+        />
+
+        <Modal
+          visible={this.state.clearBillVisible}
+          title="Are you sure?"
+          content={
+            <View style={{flex:1, flexDirection:'column', alignItems:'center'}}>
+              <Text>This will delete all the contents in your bill</Text>
+            </View>
+          }
+          onAccept={()=>{
+            this.props.clearBill();
+            this.setState({clearBillVisible: false});
+          }}
+          onDecline={()=>{
+            this.setState({clearBillVisible: false});
+          }}
+        />
+        
         
       </View> 
     );
@@ -256,17 +299,19 @@ const styles = {
 }
 
 function mapStateToProps({ bill }) {
-  const { currentItem, items, discount, total, error, success } = bill;
-  return { currentItem, items, discount, total, error, success }
+  const { currentItem, items, discount, total, error, success, title } = bill;
+  return { currentItem, items, discount, total, error, success, title }
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({ 
     currentItemUpdate, 
     addToList,
-    saveBill,
+    // saveBill,
     loadSaved,
-    clearBill
+    clearBill,
+    topUpdates,
+    saveOthers
   }, dispatch);
 }
 
