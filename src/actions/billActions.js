@@ -31,7 +31,7 @@ export const addToList = (props) => {
   const items = [ ...props.items, { ...props.currentItem, quantity: props.currentItem.quantity==='' ? 1: props.currentItem.quantity} ];
   const current = {
     items,
-    discount: props.discount,
+    discountPer: props.discountPer,
     title: props.title
   }
   // AsyncStorage.setItem('current', JSON.stringify());
@@ -69,6 +69,11 @@ export const clearBill = () => {
 };
 
 export const topUpdates = ({prop, value}) => {
+  if (prop == 'discountPer') {
+    if(!/^$|^[0-9.]+$/.test(value)) {
+      return { type: DECIMAL_VALUE_ERROR };
+    }
+  }
   return {
     type: TOP_UPDATES,
     payload: {prop, value}

@@ -29,7 +29,9 @@ const INITIAL_STATE = {
 
   success: '',
 
-  title: 'New Bill'
+  title: 'New Bill',
+
+  discountPer: 0
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -78,13 +80,20 @@ export default (state = INITIAL_STATE, action) => {
           }
           const sum_2 = 0;
           action.payload.items.forEach((item)=> sum_2+=item.total);
+
+          const discount_temp=0;
+          if (action.payload.discountPer != 0)
+            discount_temp = sum_2 * action.payload.discountPer /100;
+          
+          sum_2 -= discount_temp;
           
           return { 
             ...state, 
             items: action.payload.items, 
             currentItem: currentItem_temp_2, 
             total: sum_2,
-            discount: action.payload.discount,
+            discount: discount_temp,
+            discountPer: action.payload.discountPer,
             title: action.payload.title
           };
         } else {

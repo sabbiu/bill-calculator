@@ -41,12 +41,13 @@ class MainScreen extends Component {
       ],
 
       editTitleVisible: false,
-      clearBillVisible: false
+      clearBillVisible: false,
+      discountVisible: false
     }
   }
 
   onEditTitle = () => { this.setState({editTitleVisible:true}) }
-  onDiscount = () => {}
+  onDiscount = () => { this.setState({ discountVisible:true}) }
   onSaveBill = () => {}
   onClearBill = () => { this.setState({clearBillVisible:true}) }
 
@@ -73,7 +74,7 @@ class MainScreen extends Component {
 
   render () {
     const { listCol, rightJustified } = styles;
-    const { currentItem, items, discount, total, error, success, title } = this.props;
+    const { currentItem, items, discount, total, error, success, title, discountPer } = this.props;
 
     return (
       <View style={{flex:1, backgroundColor: '#eee'}}>
@@ -184,53 +185,78 @@ class MainScreen extends Component {
               }
 
 
-
+          {items.length > 0 ? 
+          
+            <View>
             
-            <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
-              <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
-              </View>
-              <View style={{flexGrow:1}}>
-          
-                <View style={{flex:1, flexDirection: 'row'}}>
-          
-                  <View style={[{backgroundColor: 'white',borderRightWidth:1, borderRightColor: '#ccc', flex:7}, listCol, {paddingRight:14}]}>
-                    <Text style={{fontWeight:'bold'}}>Discount</Text>
-                  </View> 
-
-                  <View style={[{backgroundColor: '#fff',borderRightWidth:1, borderRightColor: '#ccc', flex:2,}, listCol, rightJustified]}>
-                    <Text>{`${discount} %`}</Text>
-                  </View>            
-          
-                  <View style={[{backgroundColor: '#fff', flex:3}, listCol, rightJustified]}>
-                    <Text style={{fontWeight:'bold'}}>{discount.toFixed(2)}</Text>
-                  </View>         
-                
+              <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
+                <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
                 </View>
-          
+                <View style={{flexGrow:1}}>
+            
+                  <View style={{flex:1, flexDirection: 'row'}}>
+            
+                    <View style={[{backgroundColor: 'white',borderRightWidth:1, borderRightColor: '#ccc', flex:9}, listCol, {paddingRight:22}]}>
+                      <Text style={{fontWeight:'bold'}}>Sum</Text>
+                    </View>             
+            
+                    <View style={[{backgroundColor: '#fff', flex:3}, listCol, rightJustified]}>
+                      <Text style={{fontWeight:'bold'}}>{total.toFixed(2)}</Text>
+                    </View>         
+                  
+                  </View>
+            
+                </View>
               </View>
-            </View>
+
               
-
-        
-            <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
-              <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
-              </View>
-              <View style={{flexGrow:1}}>
-          
-                <View style={{flex:1, flexDirection: 'row'}}>
-          
-                  <View style={[{backgroundColor: 'white',borderRightWidth:1, borderRightColor: '#ccc', flex:9}, listCol, {paddingRight:22}]}>
-                    <Text style={{fontWeight:'bold'}}>Total</Text>
-                  </View>             
-          
-                  <View style={[{backgroundColor: '#fff', flex:3}, listCol, rightJustified]}>
-                    <Text style={{fontWeight:'bold'}}>{total.toFixed(2)}</Text>
-                  </View>         
-                
+              <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
+                <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
                 </View>
+                <View style={{flexGrow:1}}>
+            
+                  <View style={{flex:1, flexDirection: 'row'}}>
+            
+                    <View style={[{backgroundColor: 'white',borderRightWidth:1, borderRightColor: '#ccc', flex:7}, listCol, {paddingRight:14}]}>
+                      <Text style={{fontWeight:'bold'}}>Discount</Text>
+                    </View> 
+
+                    <View style={[{backgroundColor: '#fff',borderRightWidth:1, borderRightColor: '#ccc', flex:2,}, listCol, rightJustified]}>
+                      <Text>{`${discountPer} %`}</Text>
+                    </View>            
+            
+                    <View style={[{backgroundColor: '#fff', flex:3}, listCol, rightJustified]}>
+                      <Text style={{fontWeight:'bold'}}>{(discountPer * total /100).toFixed(2)}</Text>
+                    </View>         
+                  
+                  </View>
+            
+                </View>
+              </View>
+                
+
           
+              <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
+                <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
+                </View>
+                <View style={{flexGrow:1}}>
+            
+                  <View style={{flex:1, flexDirection: 'row'}}>
+            
+                    <View style={[{backgroundColor: 'white',borderRightWidth:1, borderRightColor: '#ccc', flex:9}, listCol, {paddingRight:22}]}>
+                      <Text style={{fontWeight:'bold'}}>Total</Text>
+                    </View>             
+            
+                    <View style={[{backgroundColor: '#fff', flex:3}, listCol, rightJustified]}>
+                      <Text style={{fontWeight:'bold'}}>{(total - discountPer * total/ 100).toFixed(2)}</Text>
+                    </View>         
+                  
+                  </View>
+            
+                </View>
               </View>
             </View>
+          : null}
 
 
           </List>
@@ -276,6 +302,28 @@ class MainScreen extends Component {
             this.setState({clearBillVisible: false});
           }}
         />
+
+        <Modal
+          visible={this.state.discountVisible}
+          title="Set discount for your bill"
+          content={
+            <View style={{flex:1, flexDirection:'column', alignItems:'center'}}>
+              <TextInput 
+                placeholder="Set discount percentage"
+                style={{width:"80%"}}
+                value={`${discountPer}`}
+                onChangeText={value => this.props.topUpdates({prop:'discountPer', value})}
+              />
+            </View>
+          }
+          onAccept={()=>{
+            this.props.saveOthers({prop:'discountPer', value:discountPer});
+            this.setState({discountVisible: false});
+          }}
+          onDecline={() => {
+            this.setState({discountVisible: false});            
+          }}
+        />
         
         
       </View> 
@@ -299,8 +347,8 @@ const styles = {
 }
 
 function mapStateToProps({ bill }) {
-  const { currentItem, items, discount, total, error, success, title } = bill;
-  return { currentItem, items, discount, total, error, success, title }
+  const { currentItem, items, discount, total, error, success, title, discountPer } = bill;
+  return { currentItem, items, discount, total, error, success, title, discountPer }
 }
 
 function mapDispatchToProps(dispatch) {
