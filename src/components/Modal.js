@@ -29,7 +29,9 @@ const Confirm = ({ title, content, visible, onAccept, onDecline }) => {
           {onDecline === null
             ? <View style={{flex:1}} />
             : <Button containerViewStyle={{flex:1}} buttonStyle={{backgroundColor:'#900'}} title="Cancel" onPress={onDecline} />}
-          <Button containerViewStyle={{flex:1}} buttonStyle={{backgroundColor:'#900'}} title="Confirm" onPress={onAccept} />
+          {onAccept === null
+            ? null
+            : <Button containerViewStyle={{flex:1}} buttonStyle={{backgroundColor:'#900'}} title="Confirm" onPress={onAccept} />}
         </CardSection>
       </View>
     </Modal>

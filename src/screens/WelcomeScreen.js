@@ -4,6 +4,7 @@ import {
   View,
   StyleSheet,
   AsyncStorage,
+  Platform,
   Alert
 } from 'react-native';
 import { Navigation } from 'react-native-navigation';
@@ -41,44 +42,34 @@ class WelcomeScreen extends Component {
     
   }
 
-  onPressBrowse = () => {
-    this.props.navigator.push({
-      screen: 'browse',
-      title: 'Browse Bills'
-    });
-    console.log(this.props)
-  }
-
-  onPressExport = () => {
-    Alert.alert('hello');
-  }
+  
 
   navigateToMainScreen = () => {
     this.props.navigator.resetTo({
       screen: 'main',
       title: 'New Bill',
       backButtonHidden: true,
-      navigatorButtons: {
-        rightButtons: [
-          // {
-          //   id: 'browse-button',
-          //   component: 'NavButton', // This line loads our component as a nav bar button item
-          //   title: 'hello',
-          //   passProps: {
-          //     iconName: 'folder-open',
-          //     onPress: this.onPressBrowse
-          //   },
-          // },
-          {
-            id: 'export-button',
-            component: 'NavButton', // This line loads our component as a nav bar button item
-            passProps: {
-              iconName: 'file-export',
-              onPress: this.onPressExport
-            },
-          },
-        ],
-      },
+      // navigatorButtons: {
+      //   rightButtons: [
+      //     // {
+      //     //   id: 'browse-button',
+      //     //   component: 'NavButton', // This line loads our component as a nav bar button item
+      //     //   title: 'hello',
+      //     //   passProps: {
+      //     //     iconName: 'folder-open',
+      //     //     onPress: this.onPressBrowse
+      //     //   },
+      //     // },
+      //     {
+      //       id: 'export-button',
+      //       component: 'NavButton', // This line loads our component as a nav bar button item
+      //       passProps: {
+      //         iconName: 'file-export',
+      //         onPress: this.onPressExport
+      //       },
+      //     },
+      //   ],
+      // },
     });
   }
 
