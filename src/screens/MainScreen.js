@@ -6,18 +6,22 @@ import {
   ScrollView, 
   TextInput,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  ListView,
+  TouchableOpacity
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Button } from 'react-native-elements';
 import { Navigation } from 'react-native-navigation';
+import { SwipeListView } from 'react-native-swipe-list-view';
 import RNFS from 'react-native-fs';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import CSV from 'csv.js';
 
 import ListItem from '../components/ListItem';
-import List from '../components/List';
+import ListMy from '../components/List';
+import ButtonMy from '../components/Button';
 import Modal from '../components/Modal';
 import {IconsMap, IconsLoaded} from '../components/AppIcons';
 
@@ -40,7 +44,8 @@ class MainScreen extends Component {
   constructor(props) {
     super(props);
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-    
+    this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2});
+
     this.state = {
       topButtons : [
         { title: 'Edit Title', onPress: this.onEditTitle },
@@ -300,6 +305,8 @@ class MainScreen extends Component {
     const { listCol, rightJustified } = styles;
     const { currentItem, items, discount, total, error, success, title, discountPer } = this.props;
 
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+
     return (
       <View style={{flex:1, backgroundColor: '#eee'}}>
         <View style={{height: 50}}>
@@ -355,7 +362,8 @@ class MainScreen extends Component {
         </View> 
 
         {currentItem.rate !== '' /*&& currentItem.name !== ''*/
-          ? (<Button onPress={()=>this.props.addToList(this.props)} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
+          // ? (<ButtonMy onPress={()=>this.props.addToList({ items, currentItem, discountPer, title})}> Add to List </ButtonMy>)
+          ? (<Button onPress={()=>this.props.addToList({ items, currentItem, discountPer, title})} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
           : null}
 
         {error
@@ -370,10 +378,69 @@ class MainScreen extends Component {
             </View>)
           : null}
 
-        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 60}}>
-          
-          <List>
-            {items.map((item) => {
+        
+        {/* <Container>
+          <Content> */}
+            
+          {/* </Content>
+        </Container> */}
+        
+        <ScrollView>
+
+          <SwipeListView
+              enableEmptySections
+              dataSource={this.ds.cloneWithRows(items)}
+              renderRow={item =>
+                  <View style={{flex:1, flexDirection: 'row'}}>
+                      <View style={[{backgroundColor: '#ccc', width:25}, listCol, rightJustified]}>
+                        <Text>{item.id}</Text>
+                      </View>
+                      <View style={{flexGrow:1}}>
+                  
+                        <View style={{flex:1, flexDirection: 'row'}}>
+                          <View style={[{backgroundColor: 'white', borderRightWidth:1, borderRightColor: '#ccc', flex:5}, listCol]}>
+                            <Text style={{}}>{item.name}</Text>
+                          </View>
+                  
+                          <View style={[{backgroundColor: 'white', borderRightWidth:1, borderRightColor: '#ccc', flex:2}, listCol, rightJustified]}>
+                            <Text>{item.quantity}</Text>
+                          </View>
+                  
+                          <View style={[{backgroundColor: 'white', flex:2}, listCol, rightJustified]}>
+                            <Text>{item.rate}</Text>
+                          </View>             
+                  
+                          <View style={[{backgroundColor: '#ccc', flex:3}, listCol, rightJustified]}>
+                            <Text>{item.total.toFixed(2)}</Text>
+                          </View>         
+                        
+                        </View>
+                  
+                      </View>
+                    </View>
+              }
+              renderHiddenRow={ (data, secId, rowId, rowMap) => (
+                <View style={styles.rowBack}>
+                  <TouchableOpacity 
+                    style={[styles.backLeftBtn]} 
+                    onPress={ _ => this.editRow(secId, rowId, rowMap) }
+                  >
+                    <Text style={styles.backTextWhite}>Edit</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.backRightBtn, styles.backRightBtnRight]} 
+                    onPress={ _ => this.deleteRow(secId, rowId, rowMap) }
+                  >
+                    <Text style={styles.backTextWhite}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              leftOpenValue={75}
+              rightOpenValue={-75}
+            />
+          <ListMy>
+            {/* {items.map((item) => {
               return (<ListItem
                   key = {item.id}
                   component={
@@ -406,13 +473,13 @@ class MainScreen extends Component {
                     </View>
                   }
                 />)})
-              }
+              } */}
 
 
           {items.length > 0 ? 
           
             <View>
-            
+              {/* sum */}
               <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
                 <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
                 </View>
@@ -433,7 +500,7 @@ class MainScreen extends Component {
                 </View>
               </View>
 
-              
+              {/* discount */}
               <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
                 <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
                 </View>
@@ -459,7 +526,7 @@ class MainScreen extends Component {
               </View>
                 
 
-          
+              {/* total */}
               <View style={{flex:1, flexDirection: 'row', borderTopColor:'#ccc', borderTopWidth:1}}>
                 <View style={[{width:25, backgroundColor: 'white'}, listCol, rightJustified]}>
                 </View>
@@ -483,12 +550,13 @@ class MainScreen extends Component {
           : null}
 
 
-          </List>
+          </ListMy>
 
 
 
         </ScrollView>
 
+        {/* edittitle modal */}
         <Modal
           visible={this.state.editTitleVisible}
           title="Set title for your bill"
@@ -503,13 +571,14 @@ class MainScreen extends Component {
             </View>
           }
           onAccept={()=>{
+            this.setState({editTitleVisible: false});
             this.props.navigator.setTitle({ title });
             this.props.saveOthers({prop:'title', value:title});
-            this.setState({editTitleVisible: false});
           }}
           onDecline={null}
         />
 
+        {/* clearbill modal */}
         <Modal
           visible={this.state.clearBillVisible}
           title="Are you sure?"
@@ -519,14 +588,15 @@ class MainScreen extends Component {
             </View>
           }
           onAccept={()=>{
-            this.props.clearBill();
             this.setState({clearBillVisible: false});
+            this.props.clearBill();
           }}
           onDecline={()=>{
             this.setState({clearBillVisible: false});
           }}
         />
 
+        {/* discount modal */}
         <Modal
           visible={this.state.discountVisible}
           title="Set discount percentage for your bill"
@@ -541,14 +611,15 @@ class MainScreen extends Component {
             </View>
           }
           onAccept={()=>{
-            this.props.saveOthers({prop:'discountPer', value:discountPer});
             this.setState({discountVisible: false});
+            this.props.saveOthers({prop:'discountPer', value:discountPer});
           }}
           onDecline={() => {
             this.setState({discountVisible: false});            
           }}
         />
 
+        {/* export modal */}
         <Modal
           visible={this.state.exportVisible}
           title="Export As..."
@@ -616,7 +687,43 @@ const styles = {
   },
   leftJustified: {
     justifyContent: 'right'
-  }
+  },
+  rowBack: {
+		alignItems: 'center',
+		backgroundColor: '#DDD',
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		paddingLeft: 15,
+  },
+  backLeftBtn: {
+    alignItems: 'center',
+		bottom: 0,
+		justifyContent: 'center',
+		position: 'absolute',
+		top: 0,
+    width: 75,
+    backgroundColor: 'blue'
+  },
+  backRightBtn: {
+		alignItems: 'center',
+		bottom: 0,
+		justifyContent: 'center',
+		position: 'absolute',
+		top: 0,
+		width: 75
+  },
+	backRightBtnLeft: {
+		backgroundColor: 'blue',
+		right: 75
+  },
+  backTextWhite: {
+		color: '#FFF'
+  },
+  backRightBtnRight: {
+		backgroundColor: 'red',
+		right: 0
+	},
 }
 
 function mapStateToProps({ bill }) {

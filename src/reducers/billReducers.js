@@ -38,6 +38,12 @@ export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     
     case CURRENT_ITEM_UPDATE:
+      if (action.payload.prop == 'quantity' || action.payload.prop == 'rate') {
+        if(isNaN(action.payload.value)) {
+          return { ...state, error: 'Only numeric value is allowed'};
+        }
+      }
+
       const currentItem = { ...state.currentItem, [action.payload.prop]: action.payload.value };
       if (currentItem.rate !== '') { 
         if (currentItem.quantity !== '' ) currentItem.total = +currentItem.quantity * currentItem.rate;
@@ -57,19 +63,11 @@ export default (state = INITIAL_STATE, action) => {
         }
       ];
 
-      const currentItem_temp_3 = {
-        id: state.currentItem.id+1,
-        name: '',
-        quantity: '',
-        rate: '',
-        total: 0
-      };
-
       const sum=0;
       items.forEach((item)=> sum+=item.total);
 
 
-      return { ...state, items, currentItem: currentItem_temp_3, error:'', total:sum};
+      return { ...state, items, currentItem: {...INITIAL_STATE.currentItem, id: state.currentItem.id+1 }, error:'', total:sum};
 
     case LOAD_SAVED_ITEMS:
       if (action.payload) {

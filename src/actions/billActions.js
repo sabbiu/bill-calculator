@@ -14,11 +14,11 @@ import {
 
 export const currentItemUpdate = ({prop, value}) => {
 
-  if (prop == 'quantity' || prop == 'rate') {
-    if(!/^$|^[0-9.]+$/.test(value)) {
-      return { type: DECIMAL_VALUE_ERROR };
-    }
-  }
+  // if (prop == 'quantity' || prop == 'rate') {
+  //   if(!/^$|^[0-9.]+$/.test(value)) {
+  //     return { type: DECIMAL_VALUE_ERROR };
+  //   }
+  // }
 
   return {
     type: CURRENT_ITEM_UPDATE,
@@ -26,17 +26,19 @@ export const currentItemUpdate = ({prop, value}) => {
   };
 };
 
-export const addToList = (props) => {
-  console.log(props);
-  const items = [ ...props.items, { ...props.currentItem, quantity: props.currentItem.quantity==='' ? 1: props.currentItem.quantity} ];
-  const current = {
-    items,
-    discountPer: props.discountPer,
-    title: props.title
+export const addToList = ({ items, currentItem, discountPer, title}) => {
+  return dispatch => {
+    // console.log(props);
+    // const items = [ ...props.items, { ...props.currentItem, quantity: props.currentItem.quantity==='' ? 1: props.currentItem.quantity} ];
+    const current = {
+      items: [ ...items, { ...currentItem, quantity: currentItem.quantity==='' ? 1: currentItem.quantity} ],
+      discountPer,
+      title
+    }
+    // AsyncStorage.setItem('current', JSON.stringify());
+    AsyncStorage.setItem('current', JSON.stringify(current));
+    return dispatch({ type: ADD_TO_LIST });
   }
-  // AsyncStorage.setItem('current', JSON.stringify());
-  AsyncStorage.setItem('current', JSON.stringify(current));
-  return { type: ADD_TO_LIST };
 };
 
 export const loadSaved = () => {
