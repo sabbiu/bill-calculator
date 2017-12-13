@@ -5,7 +5,10 @@ import {
   LOAD_SAVED_ITEMS,
   CLEAR_BILL,
   TOP_UPDATES,
-  SAVE_OTHERS
+  SAVE_OTHERS,
+  DELETE_ROW,
+  EDIT_ROW,
+  SAVE_EDIT_TO_LIST,
 
 } from '../actions/types';
 
@@ -31,7 +34,9 @@ const INITIAL_STATE = {
 
   title: 'New Bill',
 
-  discountPer: 0
+  discountPer: 0,
+
+  editing: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -79,18 +84,11 @@ export default (state = INITIAL_STATE, action) => {
           const sum_2 = 0;
           action.payload.items.forEach((item)=> sum_2+=item.total);
 
-          // const discount_temp=0;
-          // if (action.payload.discountPer != 0)
-          //   discount_temp = sum_2 * action.payload.discountPer /100;
-          
-          // sum_2 -= discount_temp;
-          
           return { 
             ...state, 
             items: action.payload.items, 
             currentItem: currentItem_temp_2, 
             total: sum_2,
-            // discount: discount_temp,
             discountPer: action.payload.discountPer,
             title: action.payload.title
           };
@@ -104,6 +102,34 @@ export default (state = INITIAL_STATE, action) => {
     
     case TOP_UPDATES:
       return { ...state, [action.payload.prop]: action.payload.value };
+    
+    case DELETE_ROW:
+      const rowId = action.payload;
+      let items_temp_1 = [];
+      for(let i=0; i<state.items.length; i++) {
+        if (i<rowId) items_temp_1.push({...state.items[i]});
+        else if (i>rowId) items_temp_1.push({...state.items[i], id:state.items[i].id-1});
+      }
+
+      const sum_1=0;
+      items_temp_1.forEach((item)=> sum_1+=item.total);
+
+      return { ...state, items:items_temp_1, currentItem: {...state.currentItem, id:items_temp_1.length +1}, total:sum_1}
+
+    case EDIT_ROW:
+      return { ...state, currentItem: {...state.items[action.payload]}, editing: true };
+    
+    case SAVE_EDIT_TO_LIST:
+      const items_temp_2 = [];
+    
+      for (let i=0; i< state.items.length; i++) {
+        if (state.currentItem.id !== i+1) items_temp_2.push({...state.items[i]});
+        else items_temp_2.push({...state.currentItem});
+      }
+      const currentItem_temp_3 = { ...INITIAL_STATE.currentItem, id: items_temp_2.length + 1 };
+      const sum_2=0;
+      items_temp_2.forEach((item)=> sum_2+=item.total);
+      return { ...state, currentItem: currentItem_temp_3, items: items_temp_2, editing: false, total:sum_2 };
 
     case SAVE_OTHERS:
     default:

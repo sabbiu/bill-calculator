@@ -18,6 +18,7 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import RNFS from 'react-native-fs';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import CSV from 'csv.js';
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import ListItem from '../components/ListItem';
 import ListMy from '../components/List';
@@ -33,7 +34,10 @@ import {
   clearBill,
   loadSaved,
   topUpdates,
-  saveOthers
+  saveOthers,
+  deleteListRow,
+  editListRow,
+  saveEditItem
 } from '../actions';
 import { SCREEN_WIDTH } from '../constants';
 
@@ -301,9 +305,23 @@ class MainScreen extends Component {
 
   }
 
+  // delete and edit row items
+  deleteRow = (secId, rowId, rowMap) => {
+    // console.log(secId, rowId, rowMap);
+    rowMap[`${secId}${rowId}`].closeRow();
+    const { items, discountPer, title} = this.props;
+    this.props.deleteListRow({rowId, items, discountPer, title});
+  }
+
+  editRow = (secId, rowId, rowMap) => {
+    // console.log(secId, rowId, rowMap);
+    rowMap[`${secId}${rowId}`].closeRow();
+    this.props.editListRow(rowId);
+  }
+
   render () {
     const { listCol, rightJustified } = styles;
-    const { currentItem, items, discount, total, error, success, title, discountPer } = this.props;
+    const { currentItem, items, discount, total, error, success, title, discountPer, editing } = this.props;
 
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
@@ -362,8 +380,9 @@ class MainScreen extends Component {
         </View> 
 
         {currentItem.rate !== '' /*&& currentItem.name !== ''*/
-          // ? (<ButtonMy onPress={()=>this.props.addToList({ items, currentItem, discountPer, title})}> Add to List </ButtonMy>)
-          ? (<Button onPress={()=>this.props.addToList({ items, currentItem, discountPer, title})} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
+          ? editing
+            ? (<Button onPress={()=>this.props.saveEditItem({ items, currentItem, discountPer, title})} title="Save Changes" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
+            : (<Button onPress={()=>this.props.addToList({ items, currentItem, discountPer, title})} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
           : null}
 
         {error
@@ -425,56 +444,22 @@ class MainScreen extends Component {
                     style={[styles.backLeftBtn]} 
                     onPress={ _ => this.editRow(secId, rowId, rowMap) }
                   >
-                    <Text style={styles.backTextWhite}>Edit</Text>
+                    <MaterialIcon name="lead-pencil" size={25} color="blue" />
                   </TouchableOpacity>
 
                   <TouchableOpacity 
                     style={[styles.backRightBtn, styles.backRightBtnRight]} 
                     onPress={ _ => this.deleteRow(secId, rowId, rowMap) }
                   >
-                    <Text style={styles.backTextWhite}>Delete</Text>
+                    <MaterialIcon name="delete" size={25} color="red" />
+                    {/* <Text style={styles.backTextWhite}>Delete</Text> */}
                   </TouchableOpacity>
                 </View>
               )}
-              leftOpenValue={75}
-              rightOpenValue={-75}
+              leftOpenValue={45}
+              rightOpenValue={-45}
             />
           <ListMy>
-            {/* {items.map((item) => {
-              return (<ListItem
-                  key = {item.id}
-                  component={
-                    <View style={{flex:1, flexDirection: 'row'}}>
-                      <View style={[{backgroundColor: '#ccc', width:25}, listCol, rightJustified]}>
-                        <Text>{item.id}</Text>
-                      </View>
-                      <View style={{flexGrow:1}}>
-                  
-                        <View style={{flex:1, flexDirection: 'row'}}>
-                          <View style={[{backgroundColor: 'white', borderRightWidth:1, borderRightColor: '#ccc', flex:5}, listCol]}>
-                            <Text style={{}}>{item.name}</Text>
-                          </View>
-                  
-                          <View style={[{backgroundColor: 'white', borderRightWidth:1, borderRightColor: '#ccc', flex:2}, listCol, rightJustified]}>
-                            <Text>{item.quantity}</Text>
-                          </View>
-                  
-                          <View style={[{backgroundColor: 'white', flex:2}, listCol, rightJustified]}>
-                            <Text>{item.rate}</Text>
-                          </View>             
-                  
-                          <View style={[{backgroundColor: '#ccc', flex:3}, listCol, rightJustified]}>
-                            <Text>{item.total.toFixed(2)}</Text>
-                          </View>         
-                        
-                        </View>
-                  
-                      </View>
-                    </View>
-                  }
-                />)})
-              } */}
-
 
           {items.length > 0 ? 
           
@@ -702,8 +687,8 @@ const styles = {
 		justifyContent: 'center',
 		position: 'absolute',
 		top: 0,
-    width: 75,
-    backgroundColor: 'blue'
+    width: 45,
+    backgroundColor: 'rgba(0,0,0,0)'
   },
   backRightBtn: {
 		alignItems: 'center',
@@ -711,24 +696,30 @@ const styles = {
 		justifyContent: 'center',
 		position: 'absolute',
 		top: 0,
-		width: 75
+		width: 45
   },
 	backRightBtnLeft: {
 		backgroundColor: 'blue',
-		right: 75
+		right: 45
   },
   backTextWhite: {
 		color: '#FFF'
   },
+  backTextBlue: {
+		color: 'blue'
+  },
+  backTextRed: {
+		color: 'red'
+  },
   backRightBtnRight: {
-		backgroundColor: 'red',
+		backgroundColor: 'rgba(0,0,0,0)',
 		right: 0
 	},
 }
 
 function mapStateToProps({ bill }) {
-  const { currentItem, items, discount, total, error, success, title, discountPer } = bill;
-  return { currentItem, items, discount, total, error, success, title, discountPer }
+  const { currentItem, items, discount, total, error, success, title, discountPer, editing } = bill;
+  return { currentItem, items, discount, total, error, success, title, discountPer, editing }
 }
 
 function mapDispatchToProps(dispatch) {
@@ -739,7 +730,10 @@ function mapDispatchToProps(dispatch) {
     loadSaved,
     clearBill,
     topUpdates,
-    saveOthers
+    saveOthers,
+    deleteListRow,
+    editListRow,
+    saveEditItem
   }, dispatch);
 }
 

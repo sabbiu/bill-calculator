@@ -6,3 +6,6 @@ export const CLEAR_BILL = 'clear_bill';
 export const LOAD_SAVED_ITEMS = 'load_saved_items';
 export const TOP_UPDATES = 'top_updates';
 export const SAVE_OTHERS = 'save_others';
+export const DELETE_ROW = 'delete_row';
+export const EDIT_ROW = 'edit_row';
+export const SAVE_EDIT_TO_LIST = 'save_edit_to_list';
