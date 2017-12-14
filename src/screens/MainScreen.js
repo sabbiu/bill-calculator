@@ -20,6 +20,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import CSV from 'csv.js';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import Loader from '../components/Loader';
 import ListItem from '../components/ListItem';
 import ListMy from '../components/List';
 import ButtonMy from '../components/Button';
@@ -114,11 +115,12 @@ class MainScreen extends Component {
    * Lifecycle methods
    */
   componentWillMount() {
-    this.props.loadSaved();
+    // this.props.loadSaved();
   }
 
   componentDidMount() {
     this._renderRightNavButtons();
+    this.props.loadSaved();
   }
 
   componentDidUpdate(prevProps) {
@@ -321,7 +323,7 @@ class MainScreen extends Component {
 
   render () {
     const { listCol, rightJustified } = styles;
-    const { currentItem, items, discount, total, error, success, title, discountPer, editing } = this.props;
+    const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading } = this.props;
 
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
@@ -396,13 +398,11 @@ class MainScreen extends Component {
               <Text style={{color: 'green'}}>This is success message</Text>
             </View>)
           : null}
-
         
-        {/* <Container>
-          <Content> */}
-            
-          {/* </Content>
-        </Container> */}
+        {loading
+          ? (<Loader width={SCREEN_WIDTH} indeterminate={true} color={'#900'} />)
+          : null}
+
         
         <ScrollView>
 
@@ -718,8 +718,8 @@ const styles = {
 }
 
 function mapStateToProps({ bill }) {
-  const { currentItem, items, discount, total, error, success, title, discountPer, editing } = bill;
-  return { currentItem, items, discount, total, error, success, title, discountPer, editing }
+  const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading } = bill;
+  return { currentItem, items, discount, total, error, success, title, discountPer, editing, loading }
 }
 
 function mapDispatchToProps(dispatch) {

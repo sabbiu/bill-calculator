@@ -37,6 +37,8 @@ const INITIAL_STATE = {
   discountPer: 0,
 
   editing: false,
+
+  loading: true,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -90,15 +92,16 @@ export default (state = INITIAL_STATE, action) => {
             currentItem: currentItem_temp_2, 
             total: sum_2,
             discountPer: action.payload.discountPer,
-            title: action.payload.title
+            title: action.payload.title,
+            loading: false
           };
         } else {
-          return { ...INITIAL_STATE, ...action.payload };
+          return { ...INITIAL_STATE, ...action.payload, loading:false };
         }
-      } else return INITIAL_STATE;
+      } else return { ...INITIAL_STATE, loading: false};
 
     case CLEAR_BILL:
-      return INITIAL_STATE;
+      return { ...INITIAL_STATE, loading:false };
     
     case TOP_UPDATES:
       return { ...state, [action.payload.prop]: action.payload.value };
