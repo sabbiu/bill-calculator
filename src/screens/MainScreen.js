@@ -5,10 +5,11 @@ import {
   Alert, 
   ScrollView, 
   TextInput,
-  TouchableWithoutFeedback,
   Keyboard,
   ListView,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
+  AsyncStorage
 } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -19,9 +20,8 @@ import RNFS from 'react-native-fs';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import CSV from 'csv.js';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import moment from 'moment';
 
-import Loader from '../components/Loader';
-import ListItem from '../components/ListItem';
 import ListMy from '../components/List';
 import ButtonMy from '../components/Button';
 import Modal from '../components/Modal';
@@ -31,14 +31,15 @@ import {IconsMap, IconsLoaded} from '../components/AppIcons';
 import { 
   currentItemUpdate, 
   addToList,
-  // saveBill,
+  saveBill,
   clearBill,
   loadSaved,
   topUpdates,
   saveOthers,
   deleteListRow,
   editListRow,
-  saveEditItem
+  saveEditItem,
+  newBill
 } from '../actions';
 import { SCREEN_WIDTH } from '../constants';
 
@@ -56,13 +57,15 @@ class MainScreen extends Component {
         { title: 'Edit Title', onPress: this.onEditTitle },
         { title: 'Discount', onPress: this.onDiscount },
         { title: 'Save Bill', onPress: this.onSaveBill },
-        { title: 'Clear Bill', onPress: this.onClearBill },
+        // { title: 'Clear Bill', onPress: this.onClearBill },
+        { title: 'New Bill', onPress: this.onNewBill },
       ],
 
       editTitleVisible: false,
       clearBillVisible: false,
       discountVisible: false,
-      exportVisible: false
+      exportVisible: false,
+      newBillVisible: false,
     }
   }
 
@@ -115,12 +118,21 @@ class MainScreen extends Component {
    * Lifecycle methods
    */
   componentWillMount() {
-    // this.props.loadSaved();
+    this.props.loadSaved();
+    // AsyncStorage.clear()
+    AsyncStorage.getAllKeys().then(response => {
+      console.log(response);
+    })
+    // const date_str = moment().format();
+    // const relative = moment(date_str).fromNow();
+    // const new_date = '2017-12-13T17:56:39+05:45';
+    // console.log('aaja ko date:', date_str, relative);
+    // console.log(moment(new_date).fromNow())
+
   }
 
   componentDidMount() {
     this._renderRightNavButtons();
-    this.props.loadSaved();
   }
 
   componentDidUpdate(prevProps) {
@@ -135,8 +147,18 @@ class MainScreen extends Component {
    */
   onEditTitle = () => { this.setState({editTitleVisible:true}) }
   onDiscount = () => { this.setState({ discountVisible:true}) }
-  onSaveBill = () => {}
+  onSaveBill = () => { 
+    const { billId, title, items, discountPer, total } = this.props;
+    const id = billId === '' ? moment().format() : billId;
+    this.props.saveBill(this.props.navigator, {
+      id, name: title
+    }, billId, {
+      billId: id,
+      title, items, discountPer, total
+    });
+  }
   onClearBill = () => { this.setState({clearBillVisible:true}) }
+  onNewBill = () => { this.setState({newBillVisible:true}) }
 
   // export as CSV
   createCSVFile = (path, csv_string) => {
@@ -298,7 +320,7 @@ class MainScreen extends Component {
         <tr>
           <td></td>
           <td colspan='3'>Total</td>
-          <td class='right'>${total.toFixed(2) - discount.toFixed(2)}</td>
+          <td class='right'>${(total.toFixed(2) - discount.toFixed(2)).toFixed(2)}</td>
         </tr>
       
       </table>`
@@ -309,21 +331,19 @@ class MainScreen extends Component {
 
   // delete and edit row items
   deleteRow = (secId, rowId, rowMap) => {
-    // console.log(secId, rowId, rowMap);
     rowMap[`${secId}${rowId}`].closeRow();
-    const { items, discountPer, title} = this.props;
-    this.props.deleteListRow({rowId, items, discountPer, title});
+    const { items, discountPer, title, billId} = this.props;
+    this.props.deleteListRow({rowId, items, discountPer, title, billId});
   }
 
   editRow = (secId, rowId, rowMap) => {
-    // console.log(secId, rowId, rowMap);
     rowMap[`${secId}${rowId}`].closeRow();
     this.props.editListRow(rowId);
   }
 
   render () {
     const { listCol, rightJustified } = styles;
-    const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading } = this.props;
+    const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading, savingLoader, billId } = this.props;
 
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
@@ -383,8 +403,8 @@ class MainScreen extends Component {
 
         {currentItem.rate !== '' /*&& currentItem.name !== ''*/
           ? editing
-            ? (<Button onPress={()=>this.props.saveEditItem({ items, currentItem, discountPer, title})} title="Save Changes" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
-            : (<Button onPress={()=>this.props.addToList({ items, currentItem, discountPer, title})} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
+            ? (<Button onPress={()=>this.props.saveEditItem({ items, currentItem, discountPer, title, billId})} title="Save Changes" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
+            : (<Button onPress={()=>this.props.addToList({ items, currentItem, discountPer, title, billId})} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
           : null}
 
         {error
@@ -400,9 +420,8 @@ class MainScreen extends Component {
           : null}
         
         {loading
-          ? (<Loader width={SCREEN_WIDTH} indeterminate={true} color={'#900'} />)
+          ? (<ActivityIndicator animating = {true} color = '#bc2b78' size = "large" />)
           : null}
-
         
         <ScrollView>
 
@@ -557,6 +576,7 @@ class MainScreen extends Component {
           }
           onAccept={()=>{
             this.setState({editTitleVisible: false});
+            if (title == '') { this.props.topUpdates({prop:'title', value:'Untitled'}) }
             this.props.navigator.setTitle({ title });
             this.props.saveOthers({prop:'title', value:title});
           }}
@@ -654,7 +674,45 @@ class MainScreen extends Component {
           }}
         />
         
-        
+        {/* saving loader modal */}
+        <Modal
+          visible={this.props.savingLoader}
+          title="Processing your request..."
+          animationType="none"
+          content={
+            <View style={{flex:1, flexDirection:'row', justifyContent:'space-around'}}>
+              <ActivityIndicator animating = {true} color = '#bc2b78' size = "large" />
+            </View>
+          }
+          onAccept={null}
+          onDecline={null}
+        />
+
+        {/* newbill modal */}
+        <Modal
+          visible={this.state.newBillVisible}
+          title="Have you saved the bill?"
+          content={
+            <View style={{flex:1, flexDirection:'column', alignItems:'center'}}>
+              <Text>This wil remove all the unsaved and create a new bill for you.</Text>
+            </View>
+          }
+          onAccept={()=>{
+            this.setState({newBillVisible: false});
+            this.props.newBill();
+          }}
+          onDecline={()=>{
+            this.setState({newBillVisible: false});
+          }}
+        />
+
+        {/* {this.props.savingLoader
+          ? (<View style={{flex:1, position: 'absolute', backgroundColor:'rgba(0,0,0,0.5)'}}>
+              <ActivityIndicator animating = {true} color = '#bc2b78' size = "large" />
+              
+            </View>)
+          : null} */}
+
       </View> 
     );
   }
@@ -718,22 +776,23 @@ const styles = {
 }
 
 function mapStateToProps({ bill }) {
-  const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading } = bill;
-  return { currentItem, items, discount, total, error, success, title, discountPer, editing, loading }
+  const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading, savingLoader, billId } = bill;
+  return { currentItem, items, discount, total, error, success, title, discountPer, editing, loading, savingLoader, billId }
 }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({ 
     currentItemUpdate, 
     addToList,
-    // saveBill,
+    saveBill,
     loadSaved,
     clearBill,
     topUpdates,
     saveOthers,
     deleteListRow,
     editListRow,
-    saveEditItem
+    saveEditItem,
+    newBill
   }, dispatch);
 }
 

@@ -3,14 +3,15 @@ import { Text, View, Modal, TextInput } from 'react-native';
 import CardSection from './CardSection';
 import { Button } from 'react-native-elements';
 
-const Confirm = ({ title, content, visible, onAccept, onDecline }) => {
+const Confirm = ({ title, content, visible, onAccept, onDecline, animationType }) => {
   const { containerStyle, textStyle, cardSectionStyle } = styles;
+  const animation = animationType || 'slide';
 
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType={animation}
       onRequestClose={() => {}}
     >
       <View style={containerStyle}>
@@ -25,14 +26,17 @@ const Confirm = ({ title, content, visible, onAccept, onDecline }) => {
           {/* </View> */}
         </CardSection>
 
-        <CardSection>
-          {onDecline === null
-            ? <View style={{flex:1}} />
-            : <Button containerViewStyle={{flex:1}} buttonStyle={{backgroundColor:'#900'}} title="Cancel" onPress={onDecline} />}
-          {onAccept === null
-            ? null
-            : <Button containerViewStyle={{flex:1}} buttonStyle={{backgroundColor:'#900'}} title="Confirm" onPress={onAccept} />}
-        </CardSection>
+        {onDecline === null && onAccept === null
+          ? null
+          : (<CardSection>
+              {onDecline === null
+                ? <View style={{flex:1}} />
+                : <Button containerViewStyle={{flex:1}} buttonStyle={{backgroundColor:'#900'}} title="Cancel" onPress={onDecline} />}
+              {onAccept === null
+                ? null
+                : <Button containerViewStyle={{flex:1}} buttonStyle={{backgroundColor:'#900'}} title="Confirm" onPress={onAccept} />}
+            </CardSection>)}
+        
       </View>
     </Modal>
   );

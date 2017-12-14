@@ -9,10 +9,15 @@ import {
   DELETE_ROW,
   EDIT_ROW,
   SAVE_EDIT_TO_LIST,
+  SHOW_SAVING,
+  POPULATE_BILL,
+  NEW_BILL,
 
 } from '../actions/types';
 
 const INITIAL_STATE = {
+
+  billId: '',
 
   currentItem: {
     id: 1,
@@ -39,6 +44,8 @@ const INITIAL_STATE = {
   editing: false,
 
   loading: true,
+
+  savingLoader: false
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -93,14 +100,18 @@ export default (state = INITIAL_STATE, action) => {
             total: sum_2,
             discountPer: action.payload.discountPer,
             title: action.payload.title,
-            loading: false
+            loading: false,
+            billId: action.payload.billId
           };
         } else {
-          return { ...INITIAL_STATE, ...action.payload, loading:false };
+          return { ...INITIAL_STATE, billId: state.billId, ...action.payload, loading:false };
         }
-      } else return { ...INITIAL_STATE, loading: false};
+      } else return { ...INITIAL_STATE, billId: state.billId, loading: false};
 
     case CLEAR_BILL:
+      return { ...INITIAL_STATE, billId: state.billId, title: state.title, loading:false };
+    
+    case NEW_BILL:
       return { ...INITIAL_STATE, loading:false };
     
     case TOP_UPDATES:
@@ -133,6 +144,20 @@ export default (state = INITIAL_STATE, action) => {
       const sum_2=0;
       items_temp_2.forEach((item)=> sum_2+=item.total);
       return { ...state, currentItem: currentItem_temp_3, items: items_temp_2, editing: false, total:sum_2 };
+
+    case SHOW_SAVING:
+      return { ...state, savingLoader: action.payload };
+
+    case POPULATE_BILL:
+      console.log('reducer ma ', action.payload)
+      return { ...INITIAL_STATE, loading: false, 
+        currentItem: { ...INITIAL_STATE.currentItem, id: action.payload.items.length+1 },
+        billId: action.payload.billId,
+        items: action.payload.items, 
+        title: action.payload.title, 
+        discountPer: action.payload.discountPer, 
+        total: action.payload.total
+      };
 
     case SAVE_OTHERS:
     default:
