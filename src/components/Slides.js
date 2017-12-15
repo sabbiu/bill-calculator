@@ -32,8 +32,8 @@ class Slides extends Component {
         <Image
           style={[absolute, img]}
           resizeMode='cover'
-          source={require('../assets/welcome_1.jpg')} 
-          blurRadius={6}
+          source={slide.img} 
+          blurRadius={slide.blurRadius}
         />
         <Text style={textStyle}>{slide.text}</Text>
         {this.renderLastSlide(index)}
@@ -58,7 +58,9 @@ const styles = ScaledSheet.create({
   textStyle: {
     fontSize: '30@ms',
     color: 'white',
-    marginBottom: '100@vs'
+    marginBottom: '100@vs',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 2, height: 2}
   },
   slideStyle: {
     flex: 1,

@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
 import { 
-  Text, 
   View,
-  StyleSheet,
   AsyncStorage,
   Platform,
   Alert
 } from 'react-native';
-import { Navigation } from 'react-native-navigation';
+import { Button } from 'react-native-elements';
 
 import Slides from '../components/Slides';
-import NavButton from '../components/NavButton';
 
 const SLIDE_DATA = [
-  { text: 'Welcome to Bill Calculator' },
-  { text: 'Organize your Bills' },
-  { text: 'Export Bills to PDF or CSV' }
+  { text: 'Welcome to Bill Calculator', img: require('../assets/welcome_1.jpg'), blurRadius: 6 },
+  { text: 'Organize your Bills', img: require('../assets/welcome_2.jpg'), blurRadius: 1 },
+  { text: 'Export Bills to PDF or CSV', img: require('../assets/welcome_3.jpg'), blurRadius: 2 }
 ];
 
 class WelcomeScreen extends Component {
@@ -26,19 +23,17 @@ class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
 
-    // Register Navbar Button Component
-    Navigation.registerComponent('NavButton', () => NavButton);   
   }
 
   componentWillMount() {
-    try {
-      AsyncStorage.getItem('viewed').then(viewed => {
-        console.log('viewed', viewed);
-        if (viewed == 'true') this.navigateToMainScreen();
-      });
-    } catch (error) {
-      console.log(error)
-    }
+    // try {
+    //   AsyncStorage.getItem('viewed').then(viewed => {
+    //     console.log('viewed', viewed);
+    //     if (viewed == 'true') this.navigateToMainScreen();
+    //   });
+    // } catch (error) {
+    //   console.log(error)
+    // }
     
   }
 
@@ -49,27 +44,6 @@ class WelcomeScreen extends Component {
       screen: 'main',
       title: 'New Bill',
       backButtonHidden: true,
-      // navigatorButtons: {
-      //   rightButtons: [
-      //     // {
-      //     //   id: 'browse-button',
-      //     //   component: 'NavButton', // This line loads our component as a nav bar button item
-      //     //   title: 'hello',
-      //     //   passProps: {
-      //     //     iconName: 'folder-open',
-      //     //     onPress: this.onPressBrowse
-      //     //   },
-      //     // },
-      //     {
-      //       id: 'export-button',
-      //       component: 'NavButton', // This line loads our component as a nav bar button item
-      //       passProps: {
-      //         iconName: 'file-export',
-      //         onPress: this.onPressExport
-      //       },
-      //     },
-      //   ],
-      // },
     });
   }
 
@@ -80,10 +54,28 @@ class WelcomeScreen extends Component {
 
   render() {
     return (
-      <Slides 
-        data={SLIDE_DATA} 
-        onComplete={this.onSlidesComplete} 
-      />
+      <View style={{flex: 1}}>
+        <Slides 
+          data={SLIDE_DATA} 
+          onComplete={this.onSlidesComplete} 
+        />
+        <Button
+          title="Skip Intro"
+          onPress={this.onSlidesComplete}
+          containerViewStyle={{
+            position: 'absolute',
+            bottom: 20,
+            left: 10
+          }}
+          buttonStyle={{
+            backgroundColor: 'rgba(0,0,0,0)'
+          }}
+          textStyle={{
+            borderBottomWidth: 2,
+            borderBottomColor: 'white'
+          }}
+        />
+      </View>
     );
   }
 }
