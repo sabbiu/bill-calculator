@@ -1,4 +1,5 @@
 import { AsyncStorage } from 'react-native';
+import _ from 'lodash';
 
 import {
   FETCH_BILLS, 
@@ -29,4 +30,20 @@ export const loadThisBill = id => dispatch => {
     dispatch({ type: SHOW_SAVING, payload: false });
   });
 
+}
+
+export const deleteBill = id => dispatch => {
+  AsyncStorage.getItem('savedBill').then(savedBill => {
+    if (savedBill) {
+      let saved = JSON.parse(savedBill);
+      _.remove(saved, { id });
+      AsyncStorage.setItem('savedBill', JSON.stringify(saved));
+      AsyncStorage.removeItem(id);
+
+      dispatch({ type: FETCH_BILLS, payload: saved })
+    } else {
+      dispatch({ type: FETCH_BILLS, payload: []})
+    }
+    
+  })
 }

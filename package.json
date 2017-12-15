@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "csv.js": "^1.0.4",
+    "lodash": "^4.17.4",
     "moment": "^2.19.4",
     "react": "16.0.0",
     "react-native": "0.50.4",

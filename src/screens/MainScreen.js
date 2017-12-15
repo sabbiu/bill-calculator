@@ -120,9 +120,8 @@ class MainScreen extends Component {
   componentWillMount() {
     this.props.loadSaved();
     // AsyncStorage.clear()
-    AsyncStorage.getAllKeys().then(response => {
-      console.log(response);
-    })
+    AsyncStorage.getAllKeys().then(response => { console.log(response);})
+
     // const date_str = moment().format();
     // const relative = moment(date_str).fromNow();
     // const new_date = '2017-12-13T17:56:39+05:45';
@@ -463,14 +462,14 @@ class MainScreen extends Component {
                     style={[styles.backLeftBtn]} 
                     onPress={ _ => this.editRow(secId, rowId, rowMap) }
                   >
-                    <MaterialIcon name="lead-pencil" size={25} color="blue" />
+                    <MaterialIcon name="lead-pencil" size={25} color="#3F51B5" />
                   </TouchableOpacity>
 
                   <TouchableOpacity 
                     style={[styles.backRightBtn, styles.backRightBtnRight]} 
                     onPress={ _ => this.deleteRow(secId, rowId, rowMap) }
                   >
-                    <MaterialIcon name="delete" size={25} color="red" />
+                    <MaterialIcon name="delete" size={25} color="#E33935" />
                     {/* <Text style={styles.backTextWhite}>Delete</Text> */}
                   </TouchableOpacity>
                 </View>

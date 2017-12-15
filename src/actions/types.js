@@ -13,3 +13,4 @@ export const NEW_BILL = 'new_bill';
 
 export const FETCH_BILLS = 'fetch_bills';
 export const POPULATE_BILL = 'populate_bill';
+export const DELETE_BILL = 'delete_bill';
