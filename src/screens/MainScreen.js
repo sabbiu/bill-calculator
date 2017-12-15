@@ -66,7 +66,9 @@ class MainScreen extends Component {
       discountVisible: false,
       exportVisible: false,
       newBillVisible: false,
-    }
+    };
+
+    this.inputs =[];
   }
 
   /**
@@ -121,12 +123,6 @@ class MainScreen extends Component {
     this.props.loadSaved();
     // AsyncStorage.clear()
     AsyncStorage.getAllKeys().then(response => { console.log(response);})
-
-    // const date_str = moment().format();
-    // const relative = moment(date_str).fromNow();
-    // const new_date = '2017-12-13T17:56:39+05:45';
-    // console.log('aaja ko date:', date_str, relative);
-    // console.log(moment(new_date).fromNow())
 
   }
 
@@ -340,6 +336,14 @@ class MainScreen extends Component {
     this.props.editListRow(rowId);
   }
 
+  // input field focus
+  focusNextField = id => this.inputs[id].focus();
+
+  addToList = () => {
+    const { items, currentItem, discountPer, title, billId} = this.props;
+    this.props.addToList({ items, currentItem, discountPer, title, billId});
+  }
+
   render () {
     const { listCol, rightJustified } = styles;
     const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading, savingLoader, billId } = this.props;
@@ -348,6 +352,7 @@ class MainScreen extends Component {
 
     return (
       <View style={{flex:1, backgroundColor: '#eee'}}>
+        {/* Top buttons */}
         <View style={{height: 50}}>
 
           <View style={{flex:1, flexDirection:'row', marginTop:5}}>
@@ -361,7 +366,7 @@ class MainScreen extends Component {
           </View>
         </View>
 
-
+        {/* Text inputs */}
         <View style={{height: 50, backgroundColor: 'white'}}>
           <View style={{flex:1, flexDirection: 'row'}}>
             <View style={[{ width:25, paddingLeft:0}, listCol, {flexDirection: 'row', justifyContent: 'flex-end', alignSelf: 'center'}]}>
@@ -375,6 +380,11 @@ class MainScreen extends Component {
                     placeholder="Item Name"
                     value={currentItem.name}
                     onChangeText={value => this.props.currentItemUpdate({prop:'name', value})}
+
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => this.focusNextField('qty')}
+                    ref={input => this.inputs['name'] = input}
+                    returnKeyType={'next'}
                   />
                 </View>
                 <View style={{flex:2}}>
@@ -382,6 +392,11 @@ class MainScreen extends Component {
                     placeholder="Quantity"
                     value={`${currentItem.quantity}`}
                     onChangeText={value => this.props.currentItemUpdate({prop:'quantity', value})}
+                  
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => this.focusNextField('rate')}
+                    ref={input => this.inputs['qty'] = input}
+                    returnKeyType={'next'}
                   />
                 </View>
                 <View style={{flex:2}}>
@@ -389,6 +404,11 @@ class MainScreen extends Component {
                     placeholder="Rate"
                     value={`${currentItem.rate}`}
                     onChangeText={value => this.props.currentItemUpdate({prop:'rate', value})}
+
+                    blurOnSubmit={ true }
+                    onSubmitEditing={() => {if (currentItem.rate !== '' && currentItem.name !== '') this.addToList(); this.focusNextField('name');}}
+                    returnKeyType={ "done" }
+                    ref={ input => this.inputs['rate'] = input}
                   />
                 </View>
                 <View style={[{flex:3}, listCol, {flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end'}]}>
@@ -400,10 +420,10 @@ class MainScreen extends Component {
           </View>
         </View> 
 
-        {currentItem.rate !== '' /*&& currentItem.name !== ''*/
+        {currentItem.rate !== '' && currentItem.name !== ''
           ? editing
             ? (<Button onPress={()=>this.props.saveEditItem({ items, currentItem, discountPer, title, billId})} title="Save Changes" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
-            : (<Button onPress={()=>this.props.addToList({ items, currentItem, discountPer, title, billId})} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
+            : (<Button onPress={this.addToList} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
           : null}
 
         {error
