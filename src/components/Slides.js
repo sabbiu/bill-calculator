@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { Button } from 'react-native-elements';
 import { ScaledSheet } from 'react-native-size-matters';
+import Circle from '../components/Circle';
 
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../constants';
 
@@ -17,10 +18,22 @@ class Slides extends Component {
       return (
         <Button
           title="Start Right Now!"
+          buttonStyle={{ backgroundColor: '#5981FF' }}
           raised
           onPress={this.props.onComplete}
         />
       )
+    } else {
+      return (
+        <View style={{flexDirection: 'row'}}>
+          {this.props.data.map( (item, i)=> {
+            if (i == index) return (<Circle key={i} color='#5981FF'/>);
+            else return (<Circle key={i} color='#ccc'/>)
+          })}
+          
+        </View>
+      )
+
     }
   }
 
@@ -36,7 +49,9 @@ class Slides extends Component {
           blurRadius={slide.blurRadius}
         />
         <Text style={textStyle}>{slide.text}</Text>
-        {this.renderLastSlide(index)}
+        {this.props.viewed===false
+          ? this.renderLastSlide(index)
+          : null}
       </View>
     ));
   }

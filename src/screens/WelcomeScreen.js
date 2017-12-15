@@ -23,17 +23,19 @@ class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
 
+    this.state = { viewed: null }
   }
 
   componentWillMount() {
-    // try {
-    //   AsyncStorage.getItem('viewed').then(viewed => {
-    //     console.log('viewed', viewed);
-    //     if (viewed == 'true') this.navigateToMainScreen();
-    //   });
-    // } catch (error) {
-    //   console.log(error)
-    // }
+    try {
+      AsyncStorage.getItem('viewed').then(viewed => {
+        console.log('viewed', viewed);
+        if (viewed == 'true') this.navigateToMainScreen();
+        else this.setState({ viewed: false });
+      });
+    } catch (error) {
+      console.log(error)
+    }
     
   }
 
@@ -57,24 +59,27 @@ class WelcomeScreen extends Component {
       <View style={{flex: 1}}>
         <Slides 
           data={SLIDE_DATA} 
-          onComplete={this.onSlidesComplete} 
+          onComplete={this.onSlidesComplete}
+          viewed={this.state.viewed} 
         />
-        <Button
-          title="Skip Intro"
-          onPress={this.onSlidesComplete}
-          containerViewStyle={{
-            position: 'absolute',
-            bottom: 20,
-            left: 10
-          }}
-          buttonStyle={{
-            backgroundColor: 'rgba(0,0,0,0)'
-          }}
-          textStyle={{
-            borderBottomWidth: 2,
-            borderBottomColor: 'white'
-          }}
-        />
+        {this.state.viewed === false
+          ? (<Button
+            title="Skip Intro"
+            onPress={this.onSlidesComplete}
+            containerViewStyle={{
+              position: 'absolute',
+              bottom: 20,
+              left: 10
+            }}
+            buttonStyle={{
+              backgroundColor: 'rgba(0,0,0,0)'
+            }}
+            textStyle={{
+              borderBottomWidth: 2,
+              borderBottomColor: 'white'
+            }}
+          />)
+          : null}
       </View>
     );
   }
