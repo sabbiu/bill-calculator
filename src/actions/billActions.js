@@ -72,7 +72,7 @@ export const loadSaved = () => {
         }
       })
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 };
@@ -115,7 +115,7 @@ export const saveOthers = ({prop, value}) => (dispatch) => {
       dispatch({ type: SAVE_OTHERS });
     })
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -174,6 +174,6 @@ export const saveBill = (navigator, bill, billId, bill_details) => dispatch => {
       });
     })
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };

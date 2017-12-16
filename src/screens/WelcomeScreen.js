@@ -29,12 +29,12 @@ class WelcomeScreen extends Component {
   componentWillMount() {
     try {
       AsyncStorage.getItem('viewed').then(viewed => {
-        console.log('viewed', viewed);
+        // console.log('viewed', viewed);
         if (viewed == 'true') this.navigateToMainScreen();
         else this.setState({ viewed: false });
       });
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     }
     
   }

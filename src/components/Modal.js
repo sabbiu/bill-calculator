@@ -12,7 +12,7 @@ const Confirm = ({ title, content, visible, onAccept, onDecline, animationType }
       visible={visible}
       transparent
       animationType={animation}
-      onRequestClose={() => {}}
+      onRequestClose={() => { if (onDecline !== null) onDecline(); }}
     >
       <View style={containerStyle}>
         <CardSection style={[cardSectionStyle]}>

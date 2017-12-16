@@ -54,7 +54,7 @@ class MainScreen extends Component {
 
     this.state = {
       topButtons : [
-        { title: 'Edit Title', onPress: this.onEditTitle },
+        { title: 'Set Title', onPress: this.onEditTitle },
         { title: 'Discount', onPress: this.onDiscount },
         { title: 'Save Bill', onPress: this.onSaveBill },
         // { title: 'Clear Bill', onPress: this.onClearBill },
@@ -93,7 +93,11 @@ class MainScreen extends Component {
   }
 
   onPressExport = () => {
-    this.setState({exportVisible: true});
+    if (this.props.items.length === 0) {
+      Alert.alert('Add items in the bill first');
+    } else {
+      this.setState({exportVisible: true});
+    }
   }
 
   _renderRightNavButtons() {
@@ -122,7 +126,7 @@ class MainScreen extends Component {
   componentWillMount() {
     this.props.loadSaved();
     // AsyncStorage.clear()
-    AsyncStorage.getAllKeys().then(response => { console.log(response);})
+    // AsyncStorage.getAllKeys().then(response => { console.log(response);})
 
   }
 
@@ -144,13 +148,19 @@ class MainScreen extends Component {
   onDiscount = () => { this.setState({ discountVisible:true}) }
   onSaveBill = () => { 
     const { billId, title, items, discountPer, total } = this.props;
-    const id = billId === '' ? moment().format() : billId;
-    this.props.saveBill(this.props.navigator, {
-      id, name: title
-    }, billId, {
-      billId: id,
-      title, items, discountPer, total
-    });
+    
+    if (items.length === 0 ) {
+      Alert.alert('Add items in the bill first');
+    } else {
+      const id = billId === '' ? moment().format() : billId;
+      this.props.saveBill(this.props.navigator, {
+        id, name: title
+      }, billId, {
+        billId: id,
+        title, items, discountPer, total
+      });
+    }
+    
   }
   onClearBill = () => { this.setState({clearBillVisible:true}) }
   onNewBill = () => { this.setState({newBillVisible:true}) }
@@ -162,17 +172,17 @@ class MainScreen extends Component {
       .then( success => {
         this.setState({exportVisible: false})
         Alert.alert('Exported successfully!', `Go to ${path} to view your file`)
-        console.log('file written')
+        // console.log('file written')
       })
       .catch(err => {
         Alert.alert('Export Unsuccessful');
-        console.log(err)
+        // console.log(err)
       })
   }
 
   exportAsCSV = () => {
     const { items, total, discountPer, title } = this.props;
-    console.log(items, total, discountPer, title);
+    // console.log(items, total, discountPer, title);
 
     // as csv
     // encode as csv
@@ -187,7 +197,7 @@ class MainScreen extends Component {
     }) );
 
     const csv_string = `${encoded}\n,Sum,,,${total}\n,Discount,,${discountPer}%,${total*discountPer/100}\n,Total,,,${total - total*discountPer/100}`
-    // console.log(csv_string);
+    // // console.log(csv_string);
     // check if folder exists
     const filename = `/${title.substr(0,10).split(' ').join('_')}.csv`;
     const path = DIR + filename;
@@ -197,31 +207,31 @@ class MainScreen extends Component {
 
     RNFS.exists(DIR)
       .then( success => {
-        console.log(success);
+        // console.log(success);
 
         if (!success) {
           if (Platform.OS == 'ios')
             RNFS.mkdir(dir, MkdirOptions).then(success => {
               this.createCSVFile(path, csv_string);
-              console.log(success);
+              // console.log(success);
             }).catch(error => {
-              console.log('error', error);
+              // console.log('error', error);
             });
           else
             RNFS.mkdir(dir).then(() => {
-              console.log('folder ra file duitai banyo');
+              // console.log('folder ra file duitai banyo');
               this.createCSVFile(path, csv_string);
           
             }).catch(error => {
-              console.log('error', error);
+              // console.log('error', error);
             });
         } else {
-          console.log('file banyo')
+          // console.log('file banyo')
           this.createCSVFile(path, csv_string);
         }
       })
       .catch( error => {
-        console.log('error', error);
+        // console.log('error', error);
       })
   }
 
@@ -241,19 +251,19 @@ class MainScreen extends Component {
           this.setState({exportVisible: false});
           Alert.alert('Exported successfully!', `Go to ${results.filePath} to view your file`)
         }
-        console.log(results)
+        // console.log(results)
       } catch (err) {
         Alert.alert('Export Unsuccessful');
         console.error(err)
       }
   
       // let file = await RNHTMLtoPDF.convert(options)
-      // console.log(file.filePath);
+      // // console.log(file.filePath);
     }
   exportAsPDF = () => {
 
     const { items, total, discountPer, title } = this.props;
-    // console.log(items, total, discountPer, title);
+    // // console.log(items, total, discountPer, title);
     let inner_table = '';
     items.forEach( item => {
       inner_table += `<tr style='border: 10px solid black;'>
@@ -344,6 +354,11 @@ class MainScreen extends Component {
     this.props.addToList({ items, currentItem, discountPer, title, billId});
   }
 
+  saveEditItem = () => {
+    const { items, currentItem, discountPer, title, billId} = this.props;
+    this.props.saveEditItem({ items, currentItem, discountPer, title, billId})
+  }
+
   render () {
     const { listCol, rightJustified } = styles;
     const { currentItem, items, discount, total, error, success, title, discountPer, editing, loading, savingLoader, billId } = this.props;
@@ -406,7 +421,13 @@ class MainScreen extends Component {
                     onChangeText={value => this.props.currentItemUpdate({prop:'rate', value})}
 
                     blurOnSubmit={ true }
-                    onSubmitEditing={() => {if (currentItem.rate !== '' && currentItem.name !== '') this.addToList(); this.focusNextField('name');}}
+                    onSubmitEditing={() => {
+                      if (currentItem.rate !== '' && currentItem.name !== '') {
+                        if (!editing) this.addToList(); 
+                        else this.saveEditItem();
+                      }
+                      this.focusNextField('name');
+                    }}
                     returnKeyType={ "done" }
                     ref={ input => this.inputs['rate'] = input}
                   />
@@ -422,7 +443,7 @@ class MainScreen extends Component {
 
         {currentItem.rate !== '' && currentItem.name !== ''
           ? editing
-            ? (<Button onPress={()=>this.props.saveEditItem({ items, currentItem, discountPer, title, billId})} title="Save Changes" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
+            ? (<Button onPress={this.saveEditItem} title="Save Changes" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
             : (<Button onPress={this.addToList} title="Add to List" backgroundColor="green" containerViewStyle={{width: '100%', marginLeft:0}} />)
           : null}
 
@@ -575,9 +596,18 @@ class MainScreen extends Component {
 
           </ListMy>
 
+          {items.length > 0 && items.length <6
+          ? (<View style={{ width:'100%', alignItems:'center', justifyContent: 'center'}}>
+              <Text style={{color: 'green'}}>You can swipe the entered item</Text>
+              <Text style={{color: '#3F51B5'}}>Swipe right to Edit</Text>
+              <Text style={{color: '#E33935'}}>Swipe left to Delete</Text>
+            </View>)
+          : null}
 
 
         </ScrollView>
+
+        
 
         {/* edittitle modal */}
         <Modal
@@ -752,7 +782,7 @@ const styles = {
   },
   rowBack: {
 		alignItems: 'center',
-		backgroundColor: '#DDD',
+		backgroundColor: '#eee',
 		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-between',

@@ -3,7 +3,7 @@ import {
   Text, 
   View,
   SectionList,
-  ActivityIndicator,
+  ActivityIndicator
 } from 'react-native';
 import {
   Button, ListItem
@@ -27,10 +27,11 @@ class BrowseScreen extends Component {
     this.state = {
       deleteModalVisible: false,
       toBeDeleted: ''
-    }
+    };
   }
 
   componentWillMount() {
+
     this.props.fetchBills();
   }
 
@@ -39,7 +40,6 @@ class BrowseScreen extends Component {
       animated: true,
       animationType: 'fade'
     });
-    console.log(item)
     this.props.loadThisBill(item.id);
   }
 

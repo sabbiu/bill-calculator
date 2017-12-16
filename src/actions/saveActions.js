@@ -21,10 +21,10 @@ export const fetchBills = () => dispatch => {
 export const loadThisBill = id => dispatch => {
   dispatch({ type: SHOW_SAVING, payload: true });
 
-  console.log(id);
+  // console.log(id);
   AsyncStorage.getItem(id).then(bill => {
     if (bill) {
-      console.log(JSON.parse(bill))
+      // console.log(JSON.parse(bill))
       dispatch({ type: POPULATE_BILL, payload: JSON.parse(bill) })
     }
     dispatch({ type: SHOW_SAVING, payload: false });

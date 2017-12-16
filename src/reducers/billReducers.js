@@ -149,7 +149,7 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, savingLoader: action.payload };
 
     case POPULATE_BILL:
-      console.log('reducer ma ', action.payload)
+      // console.log('reducer ma ', action.payload)
       return { ...INITIAL_STATE, loading: false, 
         currentItem: { ...INITIAL_STATE.currentItem, id: action.payload.items.length+1 },
         billId: action.payload.billId,
