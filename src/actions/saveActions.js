@@ -4,7 +4,8 @@ import _ from 'lodash';
 import {
   FETCH_BILLS, 
   SHOW_SAVING,
-  POPULATE_BILL
+  POPULATE_BILL,
+  SHOW_LOADING
 } from './types';
 
 export const fetchBills = () => dispatch => {
@@ -19,7 +20,7 @@ export const fetchBills = () => dispatch => {
 };
 
 export const loadThisBill = id => dispatch => {
-  dispatch({ type: SHOW_SAVING, payload: true });
+  dispatch({ type: SHOW_LOADING, payload: true });
 
   // console.log(id);
   AsyncStorage.getItem(id).then(bill => {
@@ -27,7 +28,7 @@ export const loadThisBill = id => dispatch => {
       // console.log(JSON.parse(bill))
       dispatch({ type: POPULATE_BILL, payload: JSON.parse(bill) })
     }
-    dispatch({ type: SHOW_SAVING, payload: false });
+    dispatch({ type: SHOW_LOADING, payload: false });
   });
 
 }

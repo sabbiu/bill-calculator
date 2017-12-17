@@ -12,6 +12,7 @@ import {
   SHOW_SAVING,
   POPULATE_BILL,
   NEW_BILL,
+  SHOW_LOADING,
 
 } from '../actions/types';
 
@@ -147,6 +148,9 @@ export default (state = INITIAL_STATE, action) => {
 
     case SHOW_SAVING:
       return { ...state, savingLoader: action.payload };
+    
+    case SHOW_LOADING:
+      return { ...state, loading: action.payload };
 
     case POPULATE_BILL:
       // console.log('reducer ma ', action.payload)

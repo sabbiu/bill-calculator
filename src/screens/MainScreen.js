@@ -127,6 +127,18 @@ class MainScreen extends Component {
     this.props.loadSaved();
     // AsyncStorage.clear()
     // AsyncStorage.getAllKeys().then(response => { console.log(response);})
+    // AsyncStorage.setItem('savedBill', JSON.stringify([
+    //   { id: moment('2017-12-17', 'YYYY-MM-DD').format(), name: 'Christmas Shopping'},
+    //   { id: moment('2017-12-16', 'YYYY-MM-DD').format(), name: 'Accessories'},
+    //   { id: moment('2017-12-16', 'YYYY-MM-DD').format(), name: 'Sports'},
+    //   { id: moment('2017-12-12', 'YYYY-MM-DD').format(), name: 'Electronics'},
+    //   { id: moment('2017-12-12', 'YYYY-MM-DD').format(), name: 'Groceries'},
+    //   { id: moment('2017-12-12', 'YYYY-MM-DD').format(), name: 'Hostel'},
+    //   { id: moment('2017-12-12', 'YYYY-MM-DD').format(), name: 'College Fee Dec'},
+    //   { id: moment('2017-10-12', 'YYYY-MM-DD').format(), name: 'Shopping Mall'},
+    //   { id: moment('2017-10-12', 'YYYY-MM-DD').format(), name: 'Groceries'},
+    //   { id: moment('2017-10-12', 'YYYY-MM-DD').format(), name: 'Hostel'},
+    // ]))
 
   }
 
@@ -199,7 +211,7 @@ class MainScreen extends Component {
     const csv_string = `${encoded}\n,Sum,,,${total}\n,Discount,,${discountPer}%,${total*discountPer/100}\n,Total,,,${total - total*discountPer/100}`
     // // console.log(csv_string);
     // check if folder exists
-    const filename = `/${title.substr(0,10).split(' ').join('_')}.csv`;
+    const filename = `/${Math.floor(Math.random()*1000)+1}${title.substr(0,20).split(' ').join('_')}.csv`;
     const path = DIR + filename;
     type MkdirOptions = {
       NSURLIsExcludedFromBackupKey?: boolean;
@@ -330,7 +342,7 @@ class MainScreen extends Component {
       
       </table>`
 
-    this.createPDF(pdf_string, title.substr(0,10).split(' ').join('_'));
+    this.createPDF(pdf_string, `${Math.floor(Math.random()*1000)+1}${title.substr(0,20).split(' ').join('_')}`);
 
   }
 
